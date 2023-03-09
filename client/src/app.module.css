@@ -1,0 +1,106 @@
+.container{
+  max-width: 1280px;
+  padding: 0 0.5rem;
+  text-align: center;
+  margin: auto;
+}
+
+.header{
+  font-size: clamp(1.75rem,2.4vw,2.5rem);
+  line-height: 1.2;
+}
+
+.input{
+  font-size: 14px;
+  padding: 0.8rem;
+  border: 0;
+  border-radius: 8px 0 0 8px;
+}
+
+.button{
+  border-radius: 0 8px 8px 0;
+}
+
+
+
+.postForm label{
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 0.5rem;
+}
+
+.postForm .input{
+  border-radius: 8px;
+}
+
+.postForm{
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: auto;
+  padding: 1.25rem;
+  background: rgba(128, 128, 128, 0.2);
+  margin-top: 1rem;
+  font-size: 14px;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.productContainer{
+  max-width: 340px;
+  margin: auto;
+  background: rgba(128, 128, 128, 0.1);
+  border-radius: 8px;
+  padding-bottom: 1.25rem;
+}
+
+.postForm .checkbox{
+  flex-direction: row;
+}
+
+.postForm button{
+  background: #646cff;
+  border-radius: 8px;
+  color: white;
+}
+
+.postForm button:hover{
+  background: #333abb;
+}
+
+.postForm legend{
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.additionalInfo{
+  list-style: none;
+  padding: 1.25rem;
+  text-align: left;
+  margin: 0;
+  max-height: 0px;
+  overflow: hidden;
+  padding: 0 1.25rem;
+  transition: max-height 500ms;
+}
+
+.additionalInfo.active{
+  max-height: 300px;
+}
+
+.showMore{
+color: #646cff;
+padding: 0;
+transition: all 300ms;
+display: flex;
+align-items: center;
+margin: auto;
+gap: 0.25rem;
+margin-bottom: 1.25rem;
+}
+
+.showMore:hover{
+  background: 0;
+  color: #333abb;
+}

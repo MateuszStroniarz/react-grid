@@ -8,6 +8,7 @@ import {
   CellChange,
   TextCell
 } from "@silevis/reactgrid";
+import styles from "./app.module.css";
 import "@silevis/reactgrid/styles.css";
 
 interface Product {
@@ -106,7 +107,7 @@ function App() {
   const [code, setCode] = useState();
   const [name, setName] = useState("Olimp");
 
-  const { data, status, refetch } = useQuery(["product", code], () =>
+  const { data, status, refetch } = useQuery(["product"], () =>
     fetchProduct(code, name)
   );
 
@@ -120,8 +121,35 @@ function App() {
     return data;
   };
 
+  const codeHandler = (e) => {
+    setCode(e.target.value);
+  };
+
+  const nameHandler = (e) => {
+    setName(e.target.value);
+  };
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+    setCode(e.target.code.value);
+    setName(e.target.name.value);
+    refetch();
+  };
+
   return (
     <section>
+      <form className={styles.postForm} onSubmit={submitHandler}>
+        <legend>Fetching form</legend>
+        <label>
+          {/* EAN */}
+          <input name="code" id="code" type="text" className={styles.input} placeholder="EAN" onChange={codeHandler} value={code}/>
+        </label>
+        <label>
+          {/* Nazwa */}
+          <input name="name" id="name" type="text" className={styles.input} placeholder="Nazwa" onChange={nameHandler} value={name} />
+        </label>
+        <button type="submit" className={styles.button}>Pobierz</button>
+      </form>
       {status === "loading" && <div>Loading...</div>}
       {status === "error" && (
         <div>Error occurred while fetching data</div>
