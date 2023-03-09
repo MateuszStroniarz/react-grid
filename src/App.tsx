@@ -1,53 +1,128 @@
-
 import * as React from "react";
-import { ReactGrid, Column, Row } from "@silevis/reactgrid";
-
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { useState } from "react";
+import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import {
+  ReactGrid,
+  Column,
+  Row,
+  CellChange,
+  TextCell
+} from "@silevis/reactgrid";
 import "@silevis/reactgrid/styles.css";
 
-interface Person {
-  name: string;
-  surname: string;
+interface Product {
+  id: string;
+  sku: string;
+  ean: string;
+  nazwa: string;
+  grupa: string;
+  ean2: string;
+  to_update: string;
+  polka: string;
 }
 
-const getPeople = (): Person[] => [
+const getPeople = (): Product[] => [
   { name: "Thomas", surname: "Goldman" },
   { name: "Susie", surname: "Quattro" },
   { name: "", surname: "" }
 ];
 
 const getColumns = (): Column[] => [
-  { columnId: "name", width: 150 },
-  { columnId: "surname", width: 150 }
+  { columnId: "id", width: 150 },
+  { columnId: "sku", width: 150 },
+  { columnId: "ean", width: 150 },
+  { columnId: "nazwa", width: 150 },
+  { columnId: "grupa", width: 150 },
+  { columnId: "ean2", width: 150 },
+  { columnId: "to_update", width: 150 },
+  { columnId: "polka", width: 150 }
 ];
 
 const headerRow: Row = {
   rowId: "header",
   cells: [
-    { type: "header", text: "Name" },
-    { type: "header", text: "Surname" }
+    { type: "header", text: "id" },
+    { type: "header", text: "sku" },
+    { type: "header", text: "ean" },
+    { type: "header", text: "nazwa" },
+    { type: "header", text: "grupa" },
+    { type: "header", text: "ean2" },
+    { type: "header", text: "to_update" },
+    { type: "header", text: "polka" }
   ]
 };
 
-const getRows = (people: Person[]): Row[] => [
+const getRows = (products: Product[]): Row[] => [
   headerRow,
-  ...people.map<Row>((person, idx) => ({
+  ...products.map<Row>((product, idx) => ({
     rowId: idx,
     cells: [
-      { type: "text", text: person.name },
-      { type: "text", text: person.surname }
+      { type: "text", text: product.id.toString() },
+      { type: "text", text: product.sku },
+      { type: "text", text: product.ean },
+      { type: "text", text: product.nazwa },
+      { type: "text", text: product.grupa },
+      { type: "text", text: product.ean2 },
+      { type: "text", text: product.to_update.toString() },
+      { type: "text", text: product.polka }
     ]
   }))
 ];
 
-function App() {
-  const [people] = React.useState<Person[]>(getPeople());
+const applyChangesToPeople = (
+  changes: CellChange<TextCell>[],
+  prevPeople: Product[]
+): Product[] => {
+  changes.forEach((change) => {
+    const personIndex = change.rowId;
+    const fieldName = change.columnId;
+    prevPeople[personIndex][fieldName] = change.newCell.text;
+  });
+  return [...prevPeople];
+};
 
-  const rows = getRows(people);
+
+
+function App() {
+
+  const [products, setProducts] = React.useState<Product[]>();
+
+  // const rows = getRows(people);
   const columns = getColumns();
 
-  return <ReactGrid rows={rows} columns={columns} />;
+  const handleChanges = (changes: CellChange<TextCell>[]) => {
+    setProducts((prevPeople) => applyChangesToPeople(changes, prevPeople));
+  };
+
+  const [code, setCode] = useState("1");
+  const [name, setName] = useState('Olimp');
+
+  const { data, status, refetch } = useQuery(["product", code], () =>
+    fetchProduct(code, name)
+  );
+
+  const fetchProduct = async (code, name) => {
+    const response = await fetch(
+      `http://localhost:3000/api/skaner?code=${code}&name=${name}`
+    );
+    const data = await response.json();
+    console.log(data)
+    setProducts(data);
+    return data;
+  };
+
+  return (
+    <section>
+      {status === "loading" && <div>Loading...</div>}
+      {status === "error" && (
+        <div>Error occurred while fetching data</div>
+      )}
+      {status === "success" && data && <>
+        <ReactGrid rows={getRows(products)} columns={columns} onCellsChanged={handleChanges} />
+      </>
+      }
+    </section>
+  );
 }
 
 export default App
