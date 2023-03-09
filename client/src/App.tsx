@@ -168,7 +168,7 @@ function App() {
         <div>Error occurred while fetching data</div>
       )}
       {status === "success" && data && <>
-        <ReactGrid rows={getRows(products)} columns={columns} onCellsChanged={handleChanges} />
+        <ReactGrid rows={getRows(products)} enableRowSelection enableColumnSelection enableRangeSelection columns={columns} onCellsChanged={handleChanges} />
       </>
       }
     </section>

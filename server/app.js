@@ -33,6 +33,8 @@ app.get("/api/products", (req, res) => {
   const dateFrom = req.query.dateFrom == 'undefined' ? false : req.query.dateFrom;
   const dateTo = req.query.dateTo == 'undefined' ? false : req.query.dateTo;
 
+  // `BETWEEN "${dateFrom}" AND "${dateTo}"`
+
   const sql = nazwa ? `SELECT * FROM test_kody WHERE ean = "${ean}" OR nazwa LIKE "%${nazwa}%"` : `SELECT * FROM test_kody WHERE ean = "${ean}" OR ean2 LIKE "%${ean}%"`;
   
   console.log(ean, nazwa, dateFrom, dateTo);
