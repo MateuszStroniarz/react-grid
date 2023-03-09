@@ -30,11 +30,15 @@ const db = mysql.createConnection({
 app.get("/api/products", (req, res) => {
   const ean = req.query.code ?? '';
   const nazwa = req.query.name == 'undefined' ? false : req.query.name;
+  const dateFrom = req.query.dateFrom == 'undefined' ? false : req.query.dateFrom;
+  const dateTo = req.query.dateTo == 'undefined' ? false : req.query.dateTo;
+
   const sql = nazwa ? `SELECT * FROM test_kody WHERE ean = "${ean}" OR nazwa LIKE "%${nazwa}%"` : `SELECT * FROM test_kody WHERE ean = "${ean}" OR ean2 LIKE "%${ean}%"`;
-  console.log(ean, nazwa);
+  
+  console.log(ean, nazwa, dateFrom, dateTo);
   db.query(sql, [ean, nazwa], (error, result) => {
     res.status(200).send(result);
-    console.log(result);
+    // console.log(result);
   })
 });
 

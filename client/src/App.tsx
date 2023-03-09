@@ -77,7 +77,7 @@ const applyChangesToPeople = (
     const personIndex = change.rowId;
     const fieldName = change.columnId;
     prevPeople[personIndex][fieldName] = change.newCell.text;
-    updateProduct({ ean: prevPeople[personIndex]["ean"],  [fieldName]:  prevPeople[personIndex][fieldName]});
+    updateProduct({ ean: prevPeople[personIndex]["ean"], [fieldName]: prevPeople[personIndex][fieldName] });
   });
   return [...prevPeople];
 };
@@ -106,14 +106,16 @@ function App() {
 
   const [code, setCode] = useState();
   const [name, setName] = useState("Olimp");
+  const [dateFrom, setDateFrom] = useState();
+  const [dateTo, setDateTo] = useState();
 
   const { data, status, refetch } = useQuery(["product"], () =>
-    fetchProduct(code, name)
+    fetchProduct(code, name, dateFrom, dateTo)
   );
 
-  const fetchProduct = async (code, name) => {
+  const fetchProduct = async (code, name, dateFrom, dateTo) => {
     const response = await fetch(
-      `http://localhost:3000/api/products?code=${code}&name=${name}`
+      `http://localhost:3000/api/products?code=${code}&name=${name}&dateFrom=${dateFrom}&dateTo=${dateTo}`
     );
     const data = await response.json();
     console.log(data)
@@ -129,6 +131,14 @@ function App() {
     setName(e.target.value);
   };
 
+  const dateFromHandler = (e) => {
+    setDateFrom(e.target.value);
+  };
+
+  const dateToHandler = (e) => {
+    setDateTo(e.target.value);
+  };
+
   const submitHandler = (e) => {
     e.preventDefault();
     setCode(e.target.code.value);
@@ -142,12 +152,15 @@ function App() {
         <legend>Fetching form</legend>
         <label>
           {/* EAN */}
-          <input name="code" id="code" type="text" className={styles.input} placeholder="EAN" onChange={codeHandler} value={code}/>
+          <input name="code" id="code" type="text" className={styles.input} placeholder="EAN" onChange={codeHandler} value={code} />
         </label>
         <label>
           {/* Nazwa */}
           <input name="name" id="name" type="text" className={styles.input} placeholder="Nazwa" onChange={nameHandler} value={name} />
         </label>
+
+        <input type="date" id="dateFrom" name="dateFrom"  className={styles.input} onChange={dateFromHandler} value={dateFrom}/>
+        <input type="date" id="dateTo" name="dateTo"  className={styles.input} onChange={dateToHandler} value={dateTo}/>
         <button type="submit" className={styles.button}>Pobierz</button>
       </form>
       {status === "loading" && <div>Loading...</div>}
