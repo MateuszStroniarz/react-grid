@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import { QueryClient, QueryClientProvider, useQuery, useMutation } from "react-query";
 import {
   ReactGrid,
   Column,
@@ -21,11 +21,6 @@ interface Product {
   polka: string;
 }
 
-const getPeople = (): Product[] => [
-  { name: "Thomas", surname: "Goldman" },
-  { name: "Susie", surname: "Quattro" },
-  { name: "", surname: "" }
-];
 
 const getColumns = (): Column[] => [
   { columnId: "id", width: 150 },
@@ -69,14 +64,20 @@ const getRows = (products: Product[]): Row[] => [
   }))
 ];
 
+
+
+
 const applyChangesToPeople = (
   changes: CellChange<TextCell>[],
-  prevPeople: Product[]
+  prevPeople: Product[],
+  addProduct
 ): Product[] => {
   changes.forEach((change) => {
     const personIndex = change.rowId;
     const fieldName = change.columnId;
     prevPeople[personIndex][fieldName] = change.newCell.text;
+    addProduct({ ean: prevPeople[personIndex]["ean"],  [fieldName]:  prevPeople[personIndex][fieldName]});
+    console.log(prevPeople[personIndex][fieldName], personIndex, fieldName, prevPeople[personIndex]["ean"]);
   });
   return [...prevPeople];
 };
@@ -85,17 +86,27 @@ const applyChangesToPeople = (
 
 function App() {
 
+  const { mutate: addProduct } = useMutation(data => {
+    return fetch('http://localhost:3000/api/test', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+  })
+
   const [products, setProducts] = React.useState<Product[]>();
 
   // const rows = getRows(people);
   const columns = getColumns();
 
   const handleChanges = (changes: CellChange<TextCell>[]) => {
-    setProducts((prevPeople) => applyChangesToPeople(changes, prevPeople));
+    setProducts((prevPeople) => applyChangesToPeople(changes, prevPeople, addProduct));
   };
 
-  const [code, setCode] = useState("1");
-  const [name, setName] = useState('Olimp');
+  const [code, setCode] = useState();
+  const [name, setName] = useState("Olimp");
 
   const { data, status, refetch } = useQuery(["product", code], () =>
     fetchProduct(code, name)
