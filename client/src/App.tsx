@@ -70,14 +70,13 @@ const getRows = (products: Product[]): Row[] => [
 const applyChangesToPeople = (
   changes: CellChange<TextCell>[],
   prevPeople: Product[],
-  addProduct
+  updateProduct
 ): Product[] => {
   changes.forEach((change) => {
     const personIndex = change.rowId;
     const fieldName = change.columnId;
     prevPeople[personIndex][fieldName] = change.newCell.text;
-    addProduct({ ean: prevPeople[personIndex]["ean"],  [fieldName]:  prevPeople[personIndex][fieldName]});
-    console.log(prevPeople[personIndex][fieldName], personIndex, fieldName, prevPeople[personIndex]["ean"]);
+    updateProduct({ ean: prevPeople[personIndex]["ean"],  [fieldName]:  prevPeople[personIndex][fieldName]});
   });
   return [...prevPeople];
 };
@@ -86,8 +85,8 @@ const applyChangesToPeople = (
 
 function App() {
 
-  const { mutate: addProduct } = useMutation(data => {
-    return fetch('http://localhost:3000/api/test', {
+  const { mutate: updateProduct } = useMutation(data => {
+    return fetch('http://localhost:3000/api/products', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -98,11 +97,10 @@ function App() {
 
   const [products, setProducts] = React.useState<Product[]>();
 
-  // const rows = getRows(people);
   const columns = getColumns();
 
   const handleChanges = (changes: CellChange<TextCell>[]) => {
-    setProducts((prevPeople) => applyChangesToPeople(changes, prevPeople, addProduct));
+    setProducts((prevPeople) => applyChangesToPeople(changes, prevPeople, updateProduct));
   };
 
   const [code, setCode] = useState();
@@ -114,7 +112,7 @@ function App() {
 
   const fetchProduct = async (code, name) => {
     const response = await fetch(
-      `http://localhost:3000/api/skaner?code=${code}&name=${name}`
+      `http://localhost:3000/api/products?code=${code}&name=${name}`
     );
     const data = await response.json();
     console.log(data)

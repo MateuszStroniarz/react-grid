@@ -27,10 +27,10 @@ const db = mysql.createConnection({
 });
 
 
-app.get("/api/skaner", (req, res) => {
+app.get("/api/products", (req, res) => {
   const ean = req.query.code ?? '';
   const nazwa = req.query.name == 'undefined' ? false : req.query.name;
-  const sql = nazwa ? `SELECT * FROM kody WHERE ean = "${ean}" OR nazwa LIKE "%${nazwa}%"` : `SELECT * FROM kody WHERE ean = "${ean}" OR ean2 LIKE "%${ean}%"`;
+  const sql = nazwa ? `SELECT * FROM test_kody WHERE ean = "${ean}" OR nazwa LIKE "%${nazwa}%"` : `SELECT * FROM test_kody WHERE ean = "${ean}" OR ean2 LIKE "%${ean}%"`;
   console.log(ean, nazwa);
   db.query(sql, [ean, nazwa], (error, result) => {
     res.status(200).send(result);
@@ -38,25 +38,12 @@ app.get("/api/skaner", (req, res) => {
   })
 });
 
-app.post("/api/skaner", jsonParser, (req, res) => {
-  const { ean, polka, to_update } = req.body;
-  
 
-  const sql = `UPDATE kody SET ? WHERE ean = ?`;
-  db.query(sql, [{polka, to_update}, ean], (error, result) => {
-    if (error) {
-      throw error
-    }
-    console.log(req.body);
-    res.status(201).send({ message: "Created" });
-  })
-});
-
-app.post("/api/test", jsonParser, (req, res) => {
+app.post("/api/products", jsonParser, (req, res) => {
   const { ean } = req.body;
   
 
-  const sql = `UPDATE kodyy SET ? WHERE ean = ?`;
+  const sql = `UPDATE test_kody SET ? WHERE ean = ?`;
   db.query(sql, [req.body, ean], (error, result) => {
     if (error) {
       throw error
