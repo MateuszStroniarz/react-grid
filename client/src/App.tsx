@@ -13,38 +13,32 @@ import "@silevis/reactgrid/styles.css";
 
 interface Product {
   id: string;
-  sku: string;
-  ean: string;
+  numer: string;
+  ob_TowId: string;
+  tc_CenaNetto1: string;
+  tc_CenaNetto3: string;
   nazwa: string;
-  grupa: string;
-  ean2: string;
-  to_update: string;
-  polka: string;
 }
 
 
 const getColumns = (): Column[] => [
   { columnId: "id", width: 150 },
-  { columnId: "sku", width: 150 },
-  { columnId: "ean", width: 150 },
-  { columnId: "nazwa", width: 150 },
-  { columnId: "grupa", width: 150 },
-  { columnId: "ean2", width: 150 },
-  { columnId: "to_update", width: 150 },
-  { columnId: "polka", width: 150 }
+  { columnId: "numer", width: 150 },
+  { columnId: "TowID", width: 150 },
+  { columnId: "tc_CenaNetto1", width: 150 },
+  { columnId: "tc_CenaNetto3", width: 150 },
+  { columnId: "nazwa", width: 500 },
 ];
 
 const headerRow: Row = {
   rowId: "header",
   cells: [
-    { type: "header", text: "id" },
-    { type: "header", text: "sku" },
-    { type: "header", text: "ean" },
-    { type: "header", text: "nazwa" },
-    { type: "header", text: "grupa" },
-    { type: "header", text: "ean2" },
-    { type: "header", text: "to_update" },
-    { type: "header", text: "polka" }
+    { type: "header", text: "ID" },
+    { type: "header", text: "Numer" },
+    { type: "header", text: "TowID" },
+    { type: "header", text: "Cena Netto 1" },
+    { type: "header", text: "Cena Netto 3" },
+    { type: "header", text: "Nazwa" },
   ]
 };
 
@@ -53,14 +47,12 @@ const getRows = (products: Product[]): Row[] => [
   ...products.map<Row>((product, idx) => ({
     rowId: idx,
     cells: [
-      { type: "text", text: product.id.toString() },
-      { type: "text", text: product.sku },
-      { type: "text", text: product.ean },
-      { type: "text", text: product.nazwa },
-      { type: "text", text: product.grupa },
-      { type: "text", text: product.ean2 },
-      { type: "text", text: product.to_update.toString() },
-      { type: "text", text: product.polka }
+      { type: "text", text: product.dok_Id.toString() },
+      { type: "text", text: product.dok_NrPelny },
+      { type: "text", text: product.ob_TowId.toString() },
+      { type: "text", text: product.tc_CenaNetto1 },
+      { type: "text", text: product.tc_CenaNetto3 },
+      { type: "text", text: product.tw_Nazwa },
     ]
   }))
 ];
@@ -77,7 +69,9 @@ const applyChangesToPeople = (
     const personIndex = change.rowId;
     const fieldName = change.columnId;
     prevPeople[personIndex][fieldName] = change.newCell.text;
-    updateProduct({ ean: prevPeople[personIndex]["ean"], [fieldName]: prevPeople[personIndex][fieldName] });
+    console.log({ tc_IdTowar: prevPeople[personIndex]["TowID"], [fieldName]: prevPeople[personIndex][fieldName] });
+    console.log(personIndex,fieldName, prevPeople[personIndex]["TowID"])
+    updateProduct({ tc_IdTowar: prevPeople[personIndex]["tc_IdTowar"], [fieldName]: prevPeople[personIndex][fieldName] });
   });
   return [...prevPeople];
 };
@@ -87,12 +81,18 @@ const applyChangesToPeople = (
 function App() {
 
   const { mutate: updateProduct } = useMutation(data => {
-    return fetch('http://localhost:3000/api/products', {
+    return fetch('http://83.19.179.106:58585/swiatsuplikopia/sql.php', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        tc_IdTowar: data.tc_IdTowar,
+        tc_tc_CenaNetto1: data.tc_CenaNetto3,
+        tc_tc_CenaNetto3: data.tc_CenaNetto3,
+        token: "Y9hCw7trPMm.vNLZX.Fm",
+        action: "save"
+      })
     })
   })
 
@@ -113,9 +113,20 @@ function App() {
     fetchProduct(code, name, dateFrom, dateTo)
   );
 
+  // const fetchProduct = async (code, name, dateFrom, dateTo) => {
+  //   const response = await fetch(
+  //     `http://83.19.179.106:58585/swiatsuplikopia/sql.php`
+  //   );
+  //   const data = await response.json();
+  //   console.log(data)
+  //   setProducts(data);
+  //   return data;
+  // };
+
   const fetchProduct = async (code, name, dateFrom, dateTo) => {
     const response = await fetch(
-      `http://localhost:3000/api/products?code=${code}&name=${name}&dateFrom=${dateFrom}&dateTo=${dateTo}`
+      `http://83.19.179.106:58585/swiatsuplikopia/sql.php?token=Y9hCw7trPMm.vNLZX.Fm&action=load`, {
+      }
     );
     const data = await response.json();
     console.log(data)
@@ -152,7 +163,7 @@ function App() {
         <legend>Fetching form</legend>
         <label>
           {/* EAN */}
-          <input name="code" id="code" type="text" className={styles.input} placeholder="EAN" onChange={codeHandler} value={code} />
+          <input name="code" id="code" type="text" className={styles.input} placeholder="ID" onChange={codeHandler} value={code} />
         </label>
         <label>
           {/* Nazwa */}
